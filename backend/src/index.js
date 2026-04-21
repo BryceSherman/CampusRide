@@ -19,10 +19,10 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'CampusRide API is running' });
 });
 
-// Routes (to be implemented)
-// app.use('/api/auth', require('./routes/auth'));
-// app.use('/api/users', require('./routes/users'));
-// app.use('/api/rides', require('./routes/rides'));
+// Routes
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/users', require('./routes/users'));
+app.use('/api/rides', require('./routes/rides'));
 app.use('/api/sanity', require('./routes/sanity'));
 
 // 404 handler

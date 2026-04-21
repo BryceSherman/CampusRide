@@ -21,7 +21,7 @@ module.exports = (sequelize) => {
     },
     passwordHash: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
       field: 'password_hash',
     },
     phone: {
@@ -32,6 +32,11 @@ module.exports = (sequelize) => {
       type: DataTypes.ENUM('rider', 'driver'),
       allowNull: false,
     },
+    // isAvailable: {
+    //   type: DataTypes.BOOLEAN,
+    //   defaultValue: true,
+    //   field: 'is_available',
+    // },
     authId: {
       type: DataTypes.STRING,
       allowNull: true,
