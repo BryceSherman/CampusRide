@@ -65,23 +65,22 @@ export const RideProvider = ({ children }) => {
   }, []);
 
   // Cancel a ride (rider action)
-  const cancelRide = useCallback(async (rideId) => {
+  const cancelRide = useCallback(async (rideId, email) => {
     try {
       setLoading(true);
       setError(null);
-      await rideService.cancelRide(rideId);
-      
-      // Update local state
+      await rideService.cancelRide(rideId, email);
+
       setRides((prev) =>
         prev.map((ride) =>
           ride.id === rideId ? { ...ride, status: 'cancelled' } : ride
         )
       );
-      
+
       if (activeRide?.id === rideId) {
         setActiveRide({ ...activeRide, status: 'cancelled' });
       }
-      
+
       return true;
     } catch (err) {
       const errorMsg = err.response?.data?.error || err.message || 'Failed to cancel ride';

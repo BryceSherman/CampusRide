@@ -25,7 +25,7 @@ export default function RideCard({ ride, isActive = false, onSelect = () => {} }
       await cancelRide(ride.id, user.email);
       setShowCancelConfirm(false);
     } catch (error) {
-      console.error('Error cancelling ride:', error);
+      console.error('Error cancelling ride:', error.response?.data || error);
     } finally {
       setCancelling(false);
     }
