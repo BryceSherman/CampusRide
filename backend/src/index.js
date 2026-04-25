@@ -43,7 +43,7 @@ const startServer = async () => {
     await sequelize.sync();
     console.log('✅ Database synced successfully.');
 
-    const PORT = process.env.PORT || 5000;
+    const PORT = process.env.PORT || 5001;
     app.listen(PORT, () => {
       console.log(`🚀 CampusRide API running on http://localhost:${PORT}`);
       console.log(`📝 Health check: http://localhost:${PORT}/api/health`);

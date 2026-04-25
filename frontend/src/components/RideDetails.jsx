@@ -18,6 +18,7 @@ export default function RideDetails({ ride }) {
   }
 
   const currentStep = STATUS_STEPS[ride.status] || 0;
+
   const steps = [
     { number: 1, label: 'Requested', icon: '📋' },
     { number: 2, label: 'Driver Accepted', icon: '✓' },
@@ -27,17 +28,23 @@ export default function RideDetails({ ride }) {
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">Ride Details</h2>
 
-      {/* Status Timeline */}
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">
+        Ride Details
+      </h2>
+
+      {/* STATUS TIMELINE */}
       <div className="mb-8">
-        <p className="text-sm font-semibold text-gray-600 mb-4">RIDE STATUS</p>
+        <p className="text-sm font-semibold text-gray-600 mb-4">
+          RIDE STATUS
+        </p>
+
         <div className="flex items-center justify-between">
           {steps.map((step, idx) => (
             <React.Fragment key={step.number}>
               <div className="flex flex-col items-center flex-1">
                 <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg mb-2 transition-colors ${
+                  className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg mb-2 ${
                     currentStep >= step.number
                       ? 'bg-blue-600 text-white'
                       : 'bg-gray-300 text-gray-600'
@@ -45,12 +52,18 @@ export default function RideDetails({ ride }) {
                 >
                   {step.icon}
                 </div>
-                <p className="text-xs font-medium text-gray-700 text-center">{step.label}</p>
+
+                <p className="text-xs font-medium text-gray-700 text-center">
+                  {step.label}
+                </p>
               </div>
+
               {idx < steps.length - 1 && (
                 <div
-                  className={`h-1 flex-1 mx-1 mb-6 transition-colors ${
-                    currentStep > step.number ? 'bg-blue-600' : 'bg-gray-300'
+                  className={`h-1 flex-1 mx-1 mb-6 ${
+                    currentStep > step.number
+                      ? 'bg-blue-600'
+                      : 'bg-gray-300'
                   }`}
                 />
               )}
@@ -59,16 +72,18 @@ export default function RideDetails({ ride }) {
         </div>
       </div>
 
-      {/* Location Details */}
+      {/* ROUTE */}
       <div className="mb-6 pb-6 border-b border-gray-200">
         <h3 className="font-semibold text-gray-800 mb-4">Route</h3>
-        
+
         <div className="space-y-4">
           <div className="flex items-start">
             <span className="text-2xl mr-3">📍</span>
             <div>
               <p className="text-xs text-gray-500 font-semibold">PICKUP</p>
-              <p className="text-gray-800 font-medium">{ride.pickupLocation}</p>
+              <p className="text-gray-800 font-medium">
+                {ride.pickupLocation}
+              </p>
             </div>
           </div>
 
@@ -76,87 +91,129 @@ export default function RideDetails({ ride }) {
             <span className="text-2xl mr-3">🏁</span>
             <div>
               <p className="text-xs text-gray-500 font-semibold">DROPOFF</p>
-              <p className="text-gray-800 font-medium">{ride.dropoffLocation}</p>
+              <p className="text-gray-800 font-medium">
+                {ride.dropoffLocation}
+              </p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Ride Information */}
+      {/* TRIP INFO */}
       <div className="mb-6 pb-6 border-b border-gray-200">
-        <h3 className="font-semibold text-gray-800 mb-4">Trip Information</h3>
-        
+        <h3 className="font-semibold text-gray-800 mb-4">
+          Trip Information
+        </h3>
+
         <div className="grid grid-cols-2 gap-4">
           {ride.distanceMiles && (
             <div>
-              <p className="text-xs text-gray-500 font-semibold">DISTANCE</p>
-              <p className="text-lg font-bold text-gray-800">{ride.distanceMiles} mi</p>
+              <p className="text-xs text-gray-500 font-semibold">
+                DISTANCE
+              </p>
+              <p className="text-lg font-bold text-gray-800">
+                {ride.distanceMiles} mi
+              </p>
             </div>
           )}
-          
+
           {ride.fareAmount && (
             <div>
-              <p className="text-xs text-gray-500 font-semibold">FARE</p>
-              <p className="text-lg font-bold text-green-600">${parseFloat(ride.fareAmount).toFixed(2)}</p>
+              <p className="text-xs text-gray-500 font-semibold">
+                FARE
+              </p>
+              <p className="text-lg font-bold text-green-600">
+                ${parseFloat(ride.fareAmount).toFixed(2)}
+              </p>
             </div>
           )}
 
           <div>
-            <p className="text-xs text-gray-500 font-semibold">REQUESTED AT</p>
-            <p className="text-gray-800">{new Date(ride.createdAt).toLocaleTimeString()}</p>
+            <p className="text-xs text-gray-500 font-semibold">
+              REQUESTED AT
+            </p>
+            <p className="text-gray-800">
+              {new Date(ride.createdAt).toLocaleTimeString()}
+            </p>
           </div>
 
           {ride.completedAt && (
             <div>
-              <p className="text-xs text-gray-500 font-semibold">COMPLETED AT</p>
-              <p className="text-gray-800">{new Date(ride.completedAt).toLocaleTimeString()}</p>
+              <p className="text-xs text-gray-500 font-semibold">
+                COMPLETED AT
+              </p>
+              <p className="text-gray-800">
+                {new Date(ride.completedAt).toLocaleTimeString()}
+              </p>
             </div>
           )}
         </div>
       </div>
 
-      {/* Driver Information */}
+      {/* DRIVER INFO */}
       {ride.status !== 'requested' && ride.status !== 'cancelled' && (
         <div className="mb-6">
           <h3 className="font-semibold text-gray-800 mb-4">Driver</h3>
+
           <div className="bg-gray-50 p-4 rounded-lg">
             {ride.driver ? (
               <>
-                <p className="text-gray-800 font-medium">{ride.driver.name}</p>
-                <p className="text-sm text-gray-600">📞 {ride.driver.phone || 'Phone not provided'}</p>
-                <p className="text-sm text-gray-600">📧 {ride.driver.email}</p>
+                <p className="text-gray-800 font-medium">
+                  {ride.driver.name}
+                </p>
+                <p className="text-sm text-gray-600">
+                  📧 {ride.driver.email}
+                </p>
               </>
             ) : (
-              <p className="text-gray-500">Driver information not available yet</p>
+              <p className="text-gray-500">
+                Driver information not available yet
+              </p>
             )}
           </div>
         </div>
       )}
 
-      {/* Status Message */}
-      <div className={`p-4 rounded-lg ${
-        ride.status === 'completed' 
-          ? 'bg-green-50 border border-green-200'
-          : ride.status === 'cancelled'
-          ? 'bg-gray-50 border border-gray-200'
-          : 'bg-blue-50 border border-blue-200'
-      }`}>
-        {ride.status === 'requested' && (
-          <p className="text-sm text-yellow-800">⏳ Waiting for a driver to accept your ride...</p>
-        )}
-        {ride.status === 'accepted' && (
-          <p className="text-sm text-blue-800">✓ A driver has accepted your ride! They'll be on the way soon.</p>
-        )}
-        {ride.status === 'in_progress' && (
-          <p className="text-sm text-blue-800">🚗 Your driver is on the way to your pickup location.</p>
-        )}
-        {ride.status === 'completed' && (
-          <p className="text-sm text-green-800">✓ Ride completed! Thank you for using CampusRide.</p>
-        )}
-        {ride.status === 'cancelled' && (
-          <p className="text-sm text-gray-800">Ride was cancelled</p>
-        )}
-      </div>
+      {/* COMPLETION BANNER */}
+      {ride.status === 'completed' && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-5 text-center">
+          <p className="text-green-800 font-bold text-lg">
+            🎉 Thank you for riding with CampusRide!
+          </p>
+
+          <p className="text-green-700 mt-2">
+            You were charged{' '}
+            <span className="font-bold">
+              ${parseFloat(ride.fareAmount).toFixed(2)}
+            </span>
+          </p>
+        </div>
+      )}
+
+      {/* OTHER STATUS MESSAGES */}
+      {ride.status === 'requested' && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          ⏳ Waiting for a driver to accept your ride...
+        </div>
+      )}
+
+      {ride.status === 'accepted' && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          ✓ A driver has accepted your ride! They'll be on the way soon.
+        </div>
+      )}
+
+      {ride.status === 'in_progress' && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          🚗 Your driver is currently taking you to your destination.
+        </div>
+      )}
+
+      {ride.status === 'cancelled' && (
+        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+          Ride was cancelled
+        </div>
+      )}
     </div>
   );
 }

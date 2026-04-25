@@ -33,7 +33,7 @@ router.get('/me', async (req, res) => {
 
 /**
  * PUT /api/users/me
- * Update current user profile
+ * Update or create current user profile
  */
 router.put('/me', async (req, res, next) => {
   try {
@@ -43,20 +43,25 @@ router.put('/me', async (req, res, next) => {
       return res.status(400).json({ error: 'Email required' });
     }
 
-    const user = await User.findOne({ where: { email } });
+    let user = await User.findOne({ where: { email } });
 
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
+      user = await User.create({
+        email,
+        name: name || email,
+        role: role && ['rider', 'driver'].includes(role) ? role : 'rider',
+        phone: phone || null,
+        passwordHash: 'ASGARDEO_SSO_USER',
+      });
+    } else {
+      if (name) user.name = name;
+      if (phone) user.phone = phone;
+      if (role && ['rider', 'driver'].includes(role)) {
+        user.role = role;
+      }
 
-    // Update fields
-    if (name) user.name = name;
-    if (phone) user.phone = phone;
-    if (role && ['rider', 'driver'].includes(role)) {
-      user.role = role;
+      await user.save();
     }
-
-    await user.save();
 
     res.json({
       message: 'Profile updated successfully',
@@ -68,38 +73,13 @@ router.put('/me', async (req, res, next) => {
         role: user.role,
       },
     });
-
   } catch (error) {
     next(error);
   }
 });
 
 /**
- * GET /api/users/:id
- * Get user by ID (public profile)
- */
-router.get('/:id', async (req, res, next) => {
-  try {
-    const user = await User.findByPk(req.params.id);
-
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    res.json({
-      id: user.id,
-      name: user.name,
-      phone: user.phone,
-      role: user.role,
-      createdAt: user.createdAt,
-    });
-  } catch (error) {
-    next(error);
-  }
-});
-
-/**
- * PUT /api/drivers/availability
+ * PUT /api/users/availability
  * Toggle driver availability
  */
 router.put('/availability', async (req, res, next) => {
@@ -131,7 +111,30 @@ router.put('/availability', async (req, res, next) => {
       message: 'Availability updated',
       isAvailable: user.isAvailable,
     });
+  } catch (error) {
+    next(error);
+  }
+});
 
+/**
+ * GET /api/users/:id
+ * Get user by ID
+ */
+router.get('/:id', async (req, res, next) => {
+  try {
+    const user = await User.findByPk(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json({
+      id: user.id,
+      name: user.name,
+      phone: user.phone,
+      role: user.role,
+      createdAt: user.createdAt,
+    });
   } catch (error) {
     next(error);
   }

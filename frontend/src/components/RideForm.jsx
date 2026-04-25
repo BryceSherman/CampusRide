@@ -1,20 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useRides } from '../context/RideContext';
 import { useAuth } from '../context/AuthContext';
 
 export default function RideForm() {
   const { user } = useAuth();
   const { createRide, loading, error, clearError } = useRides();
+
+  const BASE_RATE = 2.5;
+  const RATE_PER_MILE = 1.5;
+
   const [formData, setFormData] = useState({
     pickupLocation: '',
     dropoffLocation: '',
     distanceMiles: '3',
   });
+
   const [submitError, setSubmitError] = useState(null);
   const [success, setSuccess] = useState(false);
 
+  const estimatedFare = useMemo(() => {
+    const distance = parseFloat(formData.distanceMiles);
+    if (isNaN(distance) || distance <= 0) return null;
+    return (BASE_RATE + distance * RATE_PER_MILE).toFixed(2);
+  }, [formData.distanceMiles]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
+
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -26,7 +38,6 @@ export default function RideForm() {
     setSubmitError(null);
     setSuccess(false);
 
-    // Validation
     if (!formData.pickupLocation.trim() || !formData.dropoffLocation.trim()) {
       setSubmitError('Both pickup and dropoff locations are required');
       return;
@@ -54,22 +65,37 @@ export default function RideForm() {
         distanceMiles: formData.distanceMiles,
       });
 
-      setFormData({ pickupLocation: '', dropoffLocation: '', distanceMiles: '3' });
+      setFormData({
+        pickupLocation: '',
+        dropoffLocation: '',
+        distanceMiles: '3',
+      });
+
       setSuccess(true);
       setTimeout(() => setSuccess(false), 5000);
     } catch (err) {
-      setSubmitError(err.response?.data?.error || err.message || 'Failed to create ride request');
+      setSubmitError(
+        err.response?.data?.error ||
+        err.message ||
+        'Failed to create ride request'
+      );
     }
   };
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-2xl font-bold text-gray-800 mb-4">Request a Ride</h2>
+      <h2 className="text-2xl font-bold text-gray-800 mb-4">
+        Request a Ride
+      </h2>
 
       {success && (
         <div className="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
-          <p className="font-semibold">✓ Ride request created successfully!</p>
-          <p className="text-sm">A driver will accept your request shortly.</p>
+          <p className="font-semibold">
+            ✓ Ride request created successfully!
+          </p>
+          <p className="text-sm">
+            A driver will accept your request shortly.
+          </p>
         </div>
       )}
 
@@ -90,55 +116,65 @@ export default function RideForm() {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="pickupLocation" className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
             Pickup Location <span className="text-red-500">*</span>
           </label>
+
           <input
             type="text"
-            id="pickupLocation"
             name="pickupLocation"
             value={formData.pickupLocation}
             onChange={handleChange}
             placeholder="Enter pickup location"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             disabled={loading}
           />
         </div>
 
         <div>
-          <label htmlFor="dropoffLocation" className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
             Dropoff Location <span className="text-red-500">*</span>
           </label>
+
           <input
             type="text"
-            id="dropoffLocation"
             name="dropoffLocation"
             value={formData.dropoffLocation}
             onChange={handleChange}
             placeholder="Enter dropoff location"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             disabled={loading}
           />
         </div>
 
         <div>
-          <label htmlFor="distanceMiles" className="block text-sm font-medium text-gray-700 mb-1">
-            Estimated Distance (miles) <span className="text-red-500">*</span>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Estimated Distance (miles)
+            <span className="text-red-500">*</span>
           </label>
+
           <input
             type="number"
-            id="distanceMiles"
             name="distanceMiles"
             value={formData.distanceMiles}
             onChange={handleChange}
-            placeholder="3"
             min="0.1"
             step="0.1"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="3"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             disabled={loading}
           />
-          <p className="text-xs text-gray-500 mt-1">Fare will be calculated based on this distance</p>
+
+          <p className="text-xs text-gray-500 mt-1">
+            Fare will be calculated based on this distance
+          </p>
         </div>
+
+        {estimatedFare && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 text-blue-800 font-semibold text-center">
+            Estimated Fare: ${estimatedFare}
+          </div>
+        )}
 
         <button
           type="submit"

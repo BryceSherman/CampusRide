@@ -11,9 +11,25 @@ export default function RiderDashboard() {
   const [activeTab, setActiveTab] = useState('active'); // 'active' or 'history'
 
   useEffect(() => {
-    // Load rides on component mount
-    fetchRides({ limit: 50 });
-  }, []);
+    const load = async () => {
+      if (!user?.email) return;
+
+      const fetched = await fetchRides({
+        email: user.email,
+        limit: 50
+      });
+
+      const latestCompleted = fetched.find(
+        (r) => r.status === 'completed'
+      );
+
+      if (latestCompleted) {
+        setActiveRide(latestCompleted);
+      }
+    };
+
+    load();
+  }, [user]);
 
   // Separate active and completed rides
   const activeRides = rides.filter(

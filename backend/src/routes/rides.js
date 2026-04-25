@@ -1,4 +1,5 @@
 const express = require('express');
+const { Op } = require('sequelize');
 const { Ride, User } = require('../models');
 
 const router = express.Router();
@@ -43,17 +44,24 @@ router.post('/', async (req, res, next) => {
         role: role || 'rider',
         passwordHash: 'ASGARDEO_SSO_USER',
       });
+    } else if (role && user.role !== role) {
+      user.role = role;
+      await user.save();
     }
 
     if (user.role !== 'rider') {
       return res.status(403).json({ error: 'Only riders can create ride requests' });
     }
 
+    const miles = parseFloat(distanceMiles) || 3.0;
+    const estimatedFare = calculateFare(miles, 0);
+
     const ride = await Ride.create({
       riderId: user.id,
       pickupLocation,
       dropoffLocation,
-      distanceMiles: distanceMiles || 3.0,
+      distanceMiles: miles,
+      fareAmount: estimatedFare,
       status: 'requested',
     });
 
@@ -91,12 +99,17 @@ router.get('/', async (req, res, next) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    const whereClause = {};
+    let whereClause = {};
 
     if (user.role === 'rider') {
-      whereClause.riderId = user.id;
+      whereClause = { riderId: user.id };
     } else if (user.role === 'driver') {
-      whereClause.driverId = user.id;
+      whereClause = {
+        [Op.or]: [
+          { driverId: user.id },
+          { status: 'requested', driverId: null },
+        ],
+      };
     }
 
     const rides = await Ride.findAll({
@@ -191,8 +204,12 @@ router.get('/:id', async (req, res, next) => {
 
     const isRider = ride.riderId === user.id;
     const isDriver = ride.driverId === user.id;
+    const isAvailableToDriver =
+      user.role === 'driver' &&
+      ride.status === 'requested' &&
+      ride.driverId === null;
 
-    if (!isRider && !isDriver) {
+    if (!isRider && !isDriver && !isAvailableToDriver) {
       return res.status(403).json({ error: 'Not authorized to view this ride' });
     }
 

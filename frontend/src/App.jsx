@@ -6,6 +6,7 @@ import Navbar from './components/Navbar'
 import LoginRedirect from './pages/LoginRedirect'
 import RoleSelector from './pages/RoleSelector'
 import RiderDashboard from './pages/RiderDashboard'
+import DriverDashboard from './pages/DriverDashboard'
 
 // Protected Route Component
 function ProtectedRoute({ children, requiredRole }) {
@@ -57,15 +58,15 @@ function AppContent() {
           }
         />
 
-        {/* Driver Routes - coming soon */}
-        {/* <Route
+        {/* Driver Routes */}
+        <Route
           path="/driver/dashboard"
           element={
             <ProtectedRoute requiredRole="driver">
               <DriverDashboard />
             </ProtectedRoute>
           }
-        /> */}
+        />
 
         {/* Catch all */}
         <Route path="*" element={<Navigate to="/" replace />} />

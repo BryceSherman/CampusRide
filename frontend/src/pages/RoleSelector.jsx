@@ -12,17 +12,33 @@ export default function RoleSelector() {
     setLoading(true);
     setSelectedRole(role);
 
-    // Update role in context
-    setUserRole(role);
+    try {
+      // update role in context + localStorage
+      setUserRole(role);
 
-    // Small delay to allow context update
-    setTimeout(() => {
+      // update role in database
+      await fetch('http://localhost:5001/api/users/me', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: user.email,
+          role
+        })
+      });
+
       if (role === 'rider') {
         navigate('/rider/dashboard', { replace: true });
-      } else if (role === 'driver') {
+      } else {
         navigate('/driver/dashboard', { replace: true });
       }
-    }, 500);
+
+    } catch (err) {
+      console.error('Error setting role:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

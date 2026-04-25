@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -153,22 +153,25 @@ export const rideService = {
     }
   },
 
-  acceptRide: async (rideId) => {
+  acceptRide: async (rideId, email) => {
     try {
-      const response = await api.patch(`/api/rides/${rideId}/accept`);
+      const response = await api.patch(`/api/rides/${rideId}/accept`, { email });
       return response.data;
     } catch (error) {
-      console.error('Failed to accept ride:', error);
+      console.error('Failed to accept ride:', error.response?.data || error);
       throw error;
     }
   },
-
-  completeRide: async (rideId, durationMinutes) => {
+  
+  completeRide: async (rideId, email, durationMinutes = 15) => {
     try {
-      const response = await api.patch(`/api/rides/${rideId}/complete`, { durationMinutes });
+      const response = await api.patch(`/api/rides/${rideId}/complete`, {
+        email,
+        durationMinutes,
+      });
       return response.data;
     } catch (error) {
-      console.error('Failed to complete ride:', error);
+      console.error('Failed to complete ride:', error.response?.data || error);
       throw error;
     }
   },
@@ -183,12 +186,14 @@ export const rideService = {
     }
   },
 
-  markInProgress: async (rideId) => {
+  markInProgress: async (rideId, email) => {
     try {
-      const response = await api.patch(`/api/rides/${rideId}/in-progress`);
+      const response = await api.patch(`/api/rides/${rideId}/in-progress`, {
+        email,
+      });
       return response.data;
     } catch (error) {
-      console.error('Failed to mark ride in progress:', error);
+      console.error('Failed to mark ride in progress:', error.response?.data || error);
       throw error;
     }
   },
