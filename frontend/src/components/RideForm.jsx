@@ -12,7 +12,7 @@ export default function RideForm() {
   const [formData, setFormData] = useState({
     pickupLocation: '',
     dropoffLocation: '',
-    distanceMiles: '3',
+    distanceMiles: ' ',
   });
 
   const [submitError, setSubmitError] = useState(null);
@@ -68,7 +68,7 @@ export default function RideForm() {
       setFormData({
         pickupLocation: '',
         dropoffLocation: '',
-        distanceMiles: '3',
+        distanceMiles: ' ',
       });
 
       setSuccess(true);
@@ -160,7 +160,7 @@ export default function RideForm() {
             onChange={handleChange}
             min="0.1"
             step="0.1"
-            placeholder="3"
+            placeholder=" "
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             disabled={loading}
           />
