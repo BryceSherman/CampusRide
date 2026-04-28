@@ -17,7 +17,7 @@ export default function RoleSelector() {
       setUserRole(role);
 
       // update role in database
-      await fetch('http://localhost:5001/api/users/me', {
+      await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/users/me`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
